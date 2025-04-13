@@ -18,7 +18,7 @@ This project provides a secure setup script for deploying [ComfyUI](https://gith
 ### 1. Clone this repo
 
 ```bash
-git clone https://github.com/yourusername/comfyui-secure-setup.git
+git clone https://github.com/csimokat/comfyui-secure-setup.git
 cd comfyui-secure-setup
 ```
 ---
@@ -98,7 +98,6 @@ To cleanly remove ComfyUI and all related components, run the uninstall script:
 ```bash
 
 chmod +x scripts/uninstall_comfyui.sh
-
 ./scripts/uninstall_comfyui.sh
 
 ```
@@ -115,6 +114,7 @@ This will:
 
 ---
 
-🚧 Warnings
+🚧 Warnings:
+
 	•	This script installs services using your current user, not root
 	•	Ideal for staging or small production instances — audit before deploying in enterprise environments
