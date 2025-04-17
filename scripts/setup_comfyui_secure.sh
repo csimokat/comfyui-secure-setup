@@ -82,6 +82,11 @@ git clone https://github.com/comfyanonymous/ComfyUI.git "$COMFY_DIR"
 cd "$COMFY_DIR"
 pip install -r requirements.txt
 
+# === Install ComfyUI Manager ===
+echo "[*] Installing ComfyUI Manager..."
+cd "$COMFY_DIR/custom_nodes"
+git clone https://github.com/ltdrdata/ComfyUI-Manager.git
+
 # === Set up systemd service ===
 echo "[*] Creating systemd service for ComfyUI..."
 SERVICE_USER=$(whoami)

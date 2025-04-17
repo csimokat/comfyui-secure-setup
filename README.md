@@ -7,6 +7,7 @@ This project provides a secure setup script for deploying [ComfyUI](https://gith
 ## What It Does
 
 - Installs **Miniconda** and ComfyUI in a Conda environment
+- Installs **ComfyUI-Manager** for UI-based extension management
 - Sets up ComfyUI as a **systemd service**
 - Configures **NGINX** as a reverse proxy with HTTP basic auth
 - (Optional) Enables **HTTPS** with automatic renewal via Let's Encrypt
@@ -49,6 +50,8 @@ Access the UI: http://<your-server-ip>
 Or with HTTPS: https://yourdomain.com (if you set a domain)
 
 Login with the username and password you configured.
+
+🧩 Use the "Manager" tab in the ComfyUI interface to install extensions — no SSH needed.
 
 ---
 
