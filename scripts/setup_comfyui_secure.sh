@@ -87,6 +87,17 @@ echo "[*] Installing ComfyUI Manager..."
 cd "$COMFY_DIR/custom_nodes"
 git clone https://github.com/ltdrdata/ComfyUI-Manager.git
 
+# === Install FFmpeg and imageio-ffmpeg ===
+echo "[*] Installing ffmpeg system-wide..."
+sudo apt-get update
+sudo apt-get install -y ffmpeg
+
+echo "[*] Installing ffmpeg bindings in Conda env..."
+source "$HOME/miniconda/etc/profile.d/conda.sh"
+conda activate "$COMFY_ENV_NAME"
+pip install imageio-ffmpeg
+conda deactivate
+
 # === Set up systemd service ===
 echo "[*] Creating systemd service for ComfyUI..."
 SERVICE_USER=$(whoami)

@@ -57,5 +57,12 @@ if [[ "$REMOVE_CONFIG" == "y" || "$REMOVE_CONFIG" == "Y" ]]; then
   rm -f "$CONFIG_FILE"
 fi
 
+# (Optional) Remove ffmpeg
+read -p "Remove ffmpeg system package? [y/N]: " REMOVE_FFMPEG
+if [[ "$REMOVE_FFMPEG" == "y" || "$REMOVE_FFMPEG" == "Y" ]]; then
+  echo "[*] Removing ffmpeg..."
+  sudo apt-get remove --purge -y ffmpeg
+fi
+
 echo ""
 echo "✅ Uninstall complete."

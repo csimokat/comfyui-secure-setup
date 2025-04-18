@@ -8,6 +8,7 @@ This project provides a secure setup script for deploying [ComfyUI](https://gith
 
 - Installs **Miniconda** and ComfyUI in a Conda environment
 - Installs **ComfyUI-Manager** for UI-based extension management
+- Installs **FFmpeg** and Python bindings for video processing
 - Sets up ComfyUI as a **systemd service**
 - Configures **NGINX** as a reverse proxy with HTTP basic auth
 - (Optional) Enables **HTTPS** with automatic renewal via Let's Encrypt
@@ -56,11 +57,13 @@ Login with the username and password you configured.
 ---
 
 🛠 Requirements
-Ubuntu 20.04+ server
+- Ubuntu 20.04+ server
 
-Open ports: 80 and 443
+- FFmpeg is installed automatically — required for workflows involving video or animated output
 
-(Optional) Domain name pointed to your server
+- Open ports: 80 and 443
+
+- (Optional) Domain name pointed to your server
 
 ---
 
@@ -112,6 +115,7 @@ This will:
 	•	Clean up NGINX config and basic auth
 	•	Optionally delete your Let’s Encrypt certificate
 	•	Optionally remove Miniconda and the config file
+	•	Optionally remove ffmpeg from the system
 
 💡 Make sure you’re running this as the same user who installed ComfyUI.
 
