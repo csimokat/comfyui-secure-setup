@@ -74,6 +74,8 @@ DOMAIN: Optional — enable HTTPS with Let's Encrypt
 
 EMAIL: Required if using DOMAIN
 
+IMPORT_FROM_VOLUME: Set to `y` to automatically mount a DigitalOcean block volume and import `models/` and `custom_nodes/`
+
 ---
 
 🔒 Security Notes

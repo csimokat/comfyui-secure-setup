@@ -15,6 +15,7 @@ generate_config() {
   if [[ -n "$DOMAIN_INPUT" ]]; then
     read -p "Email for Let's Encrypt (required): " EMAIL_INPUT
   fi
+  read -p "Import models/custom_nodes from attached block volume? [y/N]: " IMPORT_FROM_VOLUME_INPUT
 
   cat <<EOF > "$CONFIG_FILE"
 # === ComfyUI Setup Configuration ===
@@ -28,6 +29,7 @@ PASSWORD="$PASSWORD_INPUT"
 
 DOMAIN="$DOMAIN_INPUT"
 EMAIL="${EMAIL_INPUT:-}"
+IMPORT_FROM_VOLUME="${IMPORT_FROM_VOLUME_INPUT:-n}"
 EOF
 }
 
@@ -86,6 +88,35 @@ pip install -r requirements.txt
 echo "[*] Installing ComfyUI Manager..."
 cd "$COMFY_DIR/custom_nodes"
 git clone https://github.com/ltdrdata/ComfyUI-Manager.git
+
+# === Optional: Import models and custom_nodes from external volume ===
+if [[ "${IMPORT_FROM_VOLUME,,}" == "y" ]]; then
+  echo "[*] Detecting DigitalOcean volume..."
+
+  VOLUME_PATH=$(ls /dev/disk/by-id/scsi-0DO_Volume_* 2>/dev/null | head -n 1)
+  if [[ -z "$VOLUME_PATH" ]]; then
+    echo "[!] No DigitalOcean volume found. Skipping volume import."
+  else
+    MOUNT_POINT="/mnt/comfy-storage"
+    sudo mkdir -p "$MOUNT_POINT"
+    echo "[*] Mounting volume $VOLUME_PATH to $MOUNT_POINT..."
+    sudo mount "$VOLUME_PATH" "$MOUNT_POINT"
+
+    if [ -d "$MOUNT_POINT/custom_nodes" ]; then
+      echo "[*] Copying custom_nodes from volume..."
+      cp -r "$MOUNT_POINT/custom_nodes/"* "$COMFY_DIR/custom_nodes/" || true
+    fi
+
+    if [ -d "$MOUNT_POINT/models" ]; then
+      echo "[*] Copying models from volume..."
+      cp -r "$MOUNT_POINT/models/"* "$COMFY_DIR/models/" || true
+    fi
+
+    echo "[*] Unmounting volume..."
+    sudo umount "$MOUNT_POINT"
+    echo "[*] Volume import complete and unmounted."
+  fi
+fi
 
 # === Install FFmpeg and imageio-ffmpeg ===
 echo "[*] Installing ffmpeg system-wide..."
