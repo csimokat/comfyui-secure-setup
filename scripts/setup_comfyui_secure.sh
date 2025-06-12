@@ -15,6 +15,8 @@ generate_config() {
   if [[ -n "$DOMAIN_INPUT" ]]; then
     read -p "Email for Let's Encrypt (required): " EMAIL_INPUT
   fi
+  read -p "Try bind-mounting models/custom_nodes from volume? [y/N]: " BIND_MOUNT_INPUT
+  BIND_MOUNT_FROM_VOLUME="${BIND_MOUNT_INPUT:-n}"
   read -p "Import models/custom_nodes from attached block volume? [y/N]: " IMPORT_FROM_VOLUME_INPUT
 
   cat <<EOF > "$CONFIG_FILE"
@@ -91,32 +93,53 @@ git clone https://github.com/ltdrdata/ComfyUI-Manager.git
 
 # === Optional: Import models and custom_nodes from external volume ===
 if [[ "${IMPORT_FROM_VOLUME,,}" == "y" ]]; then
-  echo "[*] Detecting DigitalOcean volume..."
+  echo "[*] Detecting attached DigitalOcean volume..."
 
   VOLUME_PATH=$(ls /dev/disk/by-id/scsi-0DO_Volume_* 2>/dev/null | head -n 1)
   if [[ -z "$VOLUME_PATH" ]]; then
-    echo "[!] No DigitalOcean volume found. Skipping volume import."
+    echo "[!] No volume found. Skipping import."
   else
     MOUNT_POINT="/mnt/comfy-storage"
     sudo mkdir -p "$MOUNT_POINT"
-    echo "[*] Mounting volume $VOLUME_PATH to $MOUNT_POINT..."
     sudo mount "$VOLUME_PATH" "$MOUNT_POINT"
 
-    if [ -d "$MOUNT_POINT/custom_nodes" ]; then
-      echo "[*] Copying custom_nodes from volume..."
+    if [[ "${BIND_MOUNT_FROM_VOLUME,,}" == "y" ]]; then
+      echo "[*] Attempting bind-mount of models and custom_nodes..."
+      
+      sudo mkdir -p "$COMFY_DIR/models" "$COMFY_DIR/custom_nodes"
+      if sudo mount --bind "$MOUNT_POINT/models" "$COMFY_DIR/models"; then
+        echo "✅ Bind-mounted models/"
+      else
+        echo "❌ Bind mount for models failed. Falling back to copy..."
+        cp -r "$MOUNT_POINT/models/"* "$COMFY_DIR/models/" || true
+      fi
+
+      if sudo mount --bind "$MOUNT_POINT/custom_nodes" "$COMFY_DIR/custom_nodes"; then
+        echo "✅ Bind-mounted custom_nodes/"
+      else
+        echo "❌ Bind mount for custom_nodes failed. Falling back to copy..."
+        cp -r "$MOUNT_POINT/custom_nodes/"* "$COMFY_DIR/custom_nodes/" || true
+      fi
+
+    else
+      echo "[*] Copying models and custom_nodes..."
+      cp -r "$MOUNT_POINT/models/"* "$COMFY_DIR/models/" || true
       cp -r "$MOUNT_POINT/custom_nodes/"* "$COMFY_DIR/custom_nodes/" || true
     fi
 
-    if [ -d "$MOUNT_POINT/models" ]; then
-      echo "[*] Copying models from volume..."
-      cp -r "$MOUNT_POINT/models/"* "$COMFY_DIR/models/" || true
+    # Optional: backup ComfyUI/user/default to volume
+    if [ -d "$COMFY_DIR/user/default" ]; then
+      echo "[*] Backing up user/default/ to volume..."
+      mkdir -p "$MOUNT_POINT/user_backup"
+      cp -r "$COMFY_DIR/user/default/"* "$MOUNT_POINT/user_backup/" || true
     fi
 
     echo "[*] Unmounting volume..."
     sudo umount "$MOUNT_POINT"
-    echo "[*] Volume import complete and unmounted."
+    echo "[*] Volume import and backup complete."
   fi
 fi
+
 
 # === Install FFmpeg and imageio-ffmpeg ===
 echo "[*] Installing ffmpeg system-wide..."
