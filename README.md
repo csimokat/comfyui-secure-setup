@@ -12,6 +12,9 @@ This project provides a secure setup script for deploying [ComfyUI](https://gith
 - Sets up ComfyUI as a **systemd service**
 - Configures **NGINX** as a reverse proxy with HTTP basic auth
 - (Optional) Enables **HTTPS** with automatic renewal via Let's Encrypt
+- Optionally bind-mounts or copies models and custom_nodes from a DigitalOcean volume
+- Backs up `user/default/` folder into the volume
+
 
 ---
 
@@ -74,6 +77,10 @@ DOMAIN: Optional — enable HTTPS with Let's Encrypt
 
 EMAIL: Required if using DOMAIN
 
+IMPORT_FROM_VOLUME: Set to `y` to import data from a mounted volume
+BIND_MOUNT_FROM_VOLUME: Set to `y` to attempt bind-mounting instead of copying
+
+
 IMPORT_FROM_VOLUME: Set to `y` to automatically mount a DigitalOcean block volume and import `models/` and `custom_nodes/`
 
 ---
@@ -120,6 +127,8 @@ This will:
 	•	Optionally remove ffmpeg from the system
 
 💡 Make sure you’re running this as the same user who installed ComfyUI.
+
+- If bind-mounted, you may need to unmount manually or remove any `/etc/fstab` entries
 
 ---
 
