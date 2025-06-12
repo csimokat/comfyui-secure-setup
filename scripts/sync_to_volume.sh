@@ -26,7 +26,7 @@ sync_folder() {
 
   echo "[+] Syncing $LABEL..."
   mkdir -p "$DEST"
-  rsync -av --ignore-existing "$SRC/" "$DEST/"
+  rsync -avc "$SRC/" "$DEST/"
 }
 
 sync_folder "$COMFY_DIR/custom_nodes" "$VOLUME_PATH/custom_nodes" "custom_nodes"
