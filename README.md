@@ -80,8 +80,30 @@ EMAIL: Required if using DOMAIN
 IMPORT_FROM_VOLUME: Set to `y` to import data from a mounted volume
 BIND_MOUNT_FROM_VOLUME: Set to `y` to attempt bind-mounting instead of copying
 
+---
 
-IMPORT_FROM_VOLUME: Set to `y` to automatically mount a DigitalOcean block volume and import `models/` and `custom_nodes/`
+🗂 Sync Script: sync_to_volume.sh
+
+This helper script syncs your ComfyUI folders to the volume without overwriting existing content.
+
+It copies only missing files, making it useful for incremental backups.
+
+# Mount your DigitalOcean volume first
+sudo mount /dev/disk/by-id/scsi-0DO_Volume_<yourvolume> /mnt/comfy-storage
+
+# Run the sync script
+./scripts/sync_to_volume.sh
+
+# Unmount when done
+sudo umount /mnt/comfy-storage
+
+Folders synced:
+
+custom_nodes/ → /mnt/comfy-storage/custom_nodes/
+
+models/ → /mnt/comfy-storage/models/
+
+user/default/ → /mnt/comfy-storage/user_backup/
 
 ---
 
@@ -125,10 +147,10 @@ This will:
 	•	Optionally delete your Let’s Encrypt certificate
 	•	Optionally remove Miniconda and the config file
 	•	Optionally remove ffmpeg from the system
+ 	•	If bind-mounted, you may need to unmount manually or remove any `/etc/fstab` entries
+ 
 
 💡 Make sure you’re running this as the same user who installed ComfyUI.
-
-- If bind-mounted, you may need to unmount manually or remove any `/etc/fstab` entries
 
 ---
 
